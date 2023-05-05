@@ -1,26 +1,63 @@
+// // authActions.js
+
+// import axios from "axios";
+
+// export const login = (username, password, email) => {
+//   return (dispatch) => {
+//     axios
+//       .post("http://192.168.0.64:8000/api/login/", { username, password })
+//       .then((response) => {
+//         const token = response.data.token;
+//         console.log(token);
+//         localStorage.setItem("jwtToken", token);
+//         dispatch(setCurrentUser(token));
+//       })
+//       .catch((error) => {
+//         console.log(error);
+//       });
+//   };
+// };
+
+// // Устанавливаем текущего пользователя (токен) в состояние Redux
+// export const setCurrentUser = (token) => {
+//   return {
+//     type: "SET_CURRENT_USER",
+//     payload: token,
+//   };
+// };
+
+// // Выход из системы
+// export const logout = () => {
+//   return (dispatch) => {
+//     // Удаляем токен из хранилища (localStorage)
+//     localStorage.removeItem("jwtToken");
+//     // Удаляем токен из состояния Redux
+//     dispatch(setCurrentUser(null));
+//   };
+// };
+
+
 // authActions.js
 
 import axios from 'axios';
 
-
-export const login = (username, password) => {
+// Действие для входа пользователя
+export const login = (username, password, email) => {
   return (dispatch) => {
-    // Отправляем данные на сервер для получения JWT-токена
-    axios.post('/api/login', { username, password })
+    // Отправляем запрос на сервер для получения токена
+    axios.post('http://192.168.0.64:8000/api/login/', { username, password , email})
       .then((response) => {
         const token = response.data.token;
-        // Сохраняем полученный токен в хранилище (например, в localStorage)
-        localStorage.setItem('jwtToken', token);
-        // Устанавливаем токен в состояние Redux
+        localStorage.setItem('token', token);
+        console.log(token);
         dispatch(setCurrentUser(token));
       })
       .catch((error) => {
-        console.error(error);
+        dispatch(loginError(error.response.data.error));
       });
   };
 };
 
-// Устанавливаем текущего пользователя (токен) в состояние Redux
 export const setCurrentUser = (token) => {
   return {
     type: 'SET_CURRENT_USER',
@@ -28,12 +65,9 @@ export const setCurrentUser = (token) => {
   };
 };
 
-// Выход из системы
-export const logout = () => {
-  return (dispatch) => {
-    // Удаляем токен из хранилища (localStorage)
-    localStorage.removeItem('jwtToken');
-    // Удаляем токен из состояния Redux
-    dispatch(setCurrentUser(null));
+export const loginError = (error) => {
+  return {
+    type: 'LOGIN_ERROR',
+    payload: error
   };
 };
